@@ -1,0 +1,196 @@
+#------------------------------------------------------#
+# Licencja: Masarnia by Yooka                          #
+#------------------------------------------------------#
+#  Nie zezwalam na:                                    #
+#- Zarabianie na skrypcie                              #
+#- Przerabianie/modyfikowanie                          #
+#- Wykorzystywanie kodu skryptu w swoich skryptach     #
+#- Udostepnianiu skryptu innym bez zgody autora        #
+#- Usuwanie tresci zawierajacych iformacje autora      #
+#- Podszywanie sie pod autora                          #
+# Zezwalam na:                                         #
+# - Modyfikowanie wiadomosci skryptu na wlasne         #
+#   potrzeby                                           #
+#------------------------------------------------------#
+# Mylnie odczytana licencja nie zwalnia z              #
+# przestrzegania jej                                   #
+#------------------------------------------------------#
+
+options:
+	autospawn: 30
+	wersja: 0.1
+
+command /mass [<text>] [<text>] [<text>]:
+	trigger:
+		if arg 1 is not set:
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			send "&6&LMasarnia &a&Lby &6&LYooka"
+			send "&6&L/mass &2&Lcreate&6&L/&2&Lc &6<nazwa>"
+			send "&6&L/mass &2&Lspawn &6<nazwa>"
+			send "&6&L/mass &2&Lmob &6<nazwa> <nazwa moba>"
+			send "&6&L/mass &2&Lilosc&6&L/&2&Li &6<nazwa> <liczba>"
+			send "&6&L/mass &2&Lprzycisk&6&L/&2&Lp &6<nazwa>"
+			send "&6&L/mass &2&Lpdel"
+			send "&6&L/mass &2&Lreload&6&L/&2&Lr"
+			send "&6&L/mass &2&Lauto&6&L/&2&La &6&L<nazwa> &2&Lon/off"
+			send "&6&L/mass &2&Lusun&6&L/&2&Ldel &6&L<nazwa>"
+			send "&6&L/mass &2&Llista"
+		if arg 1 is "spawn":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			if {mass.%arg 2%} is not set:
+				send "&cMasarnia o nazwie %arg 2% nie istnieje"
+				stop
+			set {massspawn.%arg 2%} to location of targeted block
+			send "&2Zapisano pocycje spawnu masarin &6%arg 2%"
+			stop
+		if arg 1 is "create" or "c":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			if arg 2 is not set:
+				send "&cPodaj nazwe"
+				stop
+			if {mass.%arg 2%} is set:
+				send "&cMasarnia o nazwie %arg 2% juz istnieje"
+				stop
+			set {mass.%arg 2%} to false
+			add arg 2 to {listamass::*}
+			send "Utworzono masarnie %arg 2%"
+			stop
+		if arg 1 is "mob":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			if arg 2 is not set:
+				send "&cPodaj nazwe"
+				stop
+			if {mass.%arg 2%} is not set:
+				send "&cMasarnia o nazwie %arg 2% nie istnieje"
+				stop
+			if arg 3 parsed as entity type is not set:
+				send "&cNie znaleziono moba o tej nazwie"
+				stop
+			set {massmob.%arg 2%} to arg 3
+			send "Zapisano moba %arg 3% do masarni %arg 2%"
+			stop
+		if arg 1 is "ilosc" or "i":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			if arg 2 is not set:
+				send "&cPodaj nazwe"
+				stop
+			if {mass.%arg 2%} is not set:
+				send "&cMasarnia o nazwie %arg 2% nie istnieje"
+				stop
+			if arg 3 parsed as number is not set:
+				send "&cArgument nie jest liczba"
+				stop
+			set {massile.%arg 2%} to arg 3
+			send "Zapisano ilosc mobow masarni %arg 2% do %arg 3%"
+			stop
+		if arg 1 is "przycisk" or "p":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			if arg 2 is not set:
+				send "&cPodaj nazwe"
+				stop
+			if {mass.%arg 2%} is not set:
+				send "&cMasarnia o nazwie %arg 2% nie istnieje"
+				stop
+			if targeted block is not button:
+				send "&cWskazany blok nie jest przyciskiem"
+				stop
+			set {massbutton.%location of targeted block%} to arg 2
+			send "&2Zapisano przycisk do masarni %arg 2%"
+			stop
+		if arg 1 is "pdel":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			if targeted block is not button:
+				send "&cWskazany blok nie jest przyciskiem"
+				stop
+			if {massbutton.%location of targeted block%} is not set:
+				send "&cTen przycisk nie jest zapisany"
+				stop
+			delete {massbutton.%location of targeted block%}
+			send "&cUsunieto zapisany przycisk"
+			stop
+		if arg 1 is "r" or "reload":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			execute player command "sk reload %script%"
+			send "&cPrzeladowano"
+			stop
+		if arg 1 is "autor" or "wersja":
+			send "&6&LMasarnia &a&Lby &6&LYooka"
+			send "&6Wersja: &7{@wersja}"
+			send "&6Autor: &7Marcin Klekner&c(Yooka)"
+			send "&6URL: &7http://meee.pl/"
+		if arg 1 is "a" or "auto":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			if arg 2 is not set:
+				send "&cPodaj nazwe"
+				stop
+			if {mass.%arg 2%} is not set:
+				send "&cMasarnia o nazwie %arg 2% nie istnieje"
+				stop
+			if arg 3 is "on":
+				set {mass.%arg 2%} to true
+				send "&2Wlaczono auto spawn masarni %arg 2%"
+				stop
+			if arg 3 is "off":
+				set {mass.%arg 2%} to false
+				send "&cWylaczono auto spawn masarni %arg 2%"
+				stop
+		if arg 1 is "usun" or "del":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			if arg 2 is not set:
+				send "&cPodaj nazwe"
+				stop
+			if {mass.%arg 2%} is not set:
+				send "&cMasarnia o nazwie %arg 2% nie istnieje"
+				stop
+			delete {mass.%arg 2%}
+			delete {massspawn.%arg 2%}
+			remove arg 2 from {listamass::*}
+			delete {massmob.%arg 2%}
+			delete {massile.%arg 2%}
+			send "&cUsunieto %arg 2%"
+			send "&cAby usunac przycisk /mass pdel"
+		if arg 1 is "lista":
+			if player doesn't have permission "masarnia":
+				send "&cBrak Uprawnien"
+				stop
+			if size of {listamass::*} is smaller than 1:
+				send "&cLista jest pusta"
+				stop
+			send "%{listamass::*}%"
+on rightclick on button:
+	set {_waited} to difference between {massspam.%name of player%} and now
+	if {_waited} is less than 10 seconds:
+		send "&cZa szybko klikasz w przycisk"
+		stop
+	if {massbutton.%location of event-block%} is set:
+		if {massile.%{massbutton.%location of event-block%}%} is not set:
+			set {massile.%{massbutton.%location of event-block%}%} to 1
+		spawn {massile.%{massbutton.%location of event-block%}%} parsed as number of {massmob.%{massbutton.%location of event-block%}%} parsed as entity type at location of {massspawn.%{massbutton.%location of event-block%}%}
+		set {massspam.%name of player%} to now
+
+every {@autospawn} seconds:
+	loop {listamass::*}:
+		if {mass.%loop-value%} is true:
+			if {massile.%loop-value%} is not set:
+				set {massile.%loop-value%} to 1
+			spawn {massile.%loop-value%} parsed as number of {massmob.%loop-value%} parsed as entity type at location of {massspawn.%loop-value%}
